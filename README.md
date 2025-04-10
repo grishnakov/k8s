@@ -88,7 +88,15 @@ sudo apt-get install -y apt-transport-https ca-certificates curl
  [https://github.com/containerd/containerd/blob/main/docs/cri/config.md](https://github.com/containerd/containerd/blob/main/docs/cri/config.md)
 
 Should be located in `/etc/containerd/config.toml`
-kubelet should be configured
+config template here: [config.toml](./config.toml)
+
+kubelet should be configured to use systemd:
+
+```
+kind: KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+cgroupDriver: "systemd"
+```
 
 ## Kubeadm config
 
