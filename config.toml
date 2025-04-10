@@ -1,0 +1,6 @@
+# /etc/containerd/config.toml
+#
+# For containerd v2 +
+version = 3
+[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runc.options]
+  SystemdCgroup = true

@@ -1,6 +1,6 @@
 # Setting up k8s
 
-### Fix for booting into Linux installer (insert into grub)
+### Fix for booting into Linux installer (insert into grub) for old radeon cards (I think)(fixes issue of linux installer not loading)
 
 ```
 radeon.modeset=0
@@ -88,6 +88,7 @@ sudo apt-get install -y apt-transport-https ca-certificates curl
  [https://github.com/containerd/containerd/blob/main/docs/cri/config.md](https://github.com/containerd/containerd/blob/main/docs/cri/config.md)
 
 Should be located in `/etc/containerd/config.toml`
+kubelet should be configured
 
 ## Kubeadm config
 
