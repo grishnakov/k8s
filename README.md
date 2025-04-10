@@ -36,11 +36,15 @@ sudo ufw allow 10250
 sudo ufw allow 30000:32767/tcp
 ```
 
+## Disable swap
+
 ```sudo vim /etc/fstab``` comment out the line with swap (last line in the case of boss)
+
+## Enable IPv4 packet forwarding
 
 ```sysctl net.ipv4.ip_forward``` needs to output 1.
 
-# sysctl params required by setup, params persist across reboots
+### sysctl params required by setup, params persist across reboots
 
 ```
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
@@ -51,3 +55,40 @@ EOF
 # Apply sysctl params without reboot
 
 `sudo sysctl --system`
+
+## Configure cgroup v2 to be the only cgroup (ensure you use systemd as your cgroup driver)
+
+Verify systemd version: ```systemd --version``` this should output version 240+
+
+```
+sudo vim  /etc/default/grub
+```
+
+Add `cgroup_no_v1=all` after the `GRUB_CMDLINE_LINUX` in the grub file.
+
+```
+sudo update-grub
+```
+
+```
+sudo reboot
+```
+
+Do `cat /proc/cmdline` after reboot to verify. If you see `cgroup_no_v1=all` in the output, it means cgroup v2 is active
+
+## Install required packages for setup of container runtime (containerd)
+
+```
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl
+```
+
+### Containerd config instructions
+
+ [https://github.com/containerd/containerd/blob/main/docs/cri/config.md](https://github.com/containerd/containerd/blob/main/docs/cri/config.md)
+
+Should be located in `/etc/containerd/config.toml`
+
+## Kubeadm config
+
+File in this repo [kubeadm-config.yaml](./kubeadm-config.yaml)
