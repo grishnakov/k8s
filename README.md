@@ -38,9 +38,11 @@ sudo modprobe overlay
 sudo modprobe br_netfilter
 ```
 
-# Apply sysctl params without reboot
+Apply sysctl params without reboot
 
-`sudo sysctl --system`
+```
+sudo sysctl --system
+```
 
 ## Configure cgroup v2 to be the only cgroup (ensure you use systemd as your cgroup driver)
 
@@ -60,7 +62,13 @@ sudo update-grub
 sudo reboot
 ```
 
-Do `cat /proc/cmdline | grub cgroup_no_v1` after reboot to verify. If you see `cgroup_no_v1=all` in the output, it means cgroup v2 is active
+Do
+
+```
+cat /proc/cmdline | grep cgroup_no_v1=all
+```
+
+after reboot to verify. If you see `cgroup_no_v1=all` in the output, it means cgroup v2 is active
 
 ## Install required packages for setup of container runtime (containerd)
 
@@ -69,12 +77,55 @@ sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl
 ```
 
+```
+sudo apt-get install -y containerd.io
+```
+
 ### Containerd config instructions
 
  [https://github.com/containerd/containerd/blob/main/docs/cri/config.md](https://github.com/containerd/containerd/blob/main/docs/cri/config.md)
 
 Should be located in `/etc/containerd/config.toml`
-config template here: [config.toml](./config.toml)
+
+### Create the correct folder and default config file
+
+```
+sudo mkdir -p /etc/containerd
+sudo containerd config default | sudo tee /etc/containerd/config.toml
+```
+
+### Modify the config file for systemd to be the cgroup driver
+
+```
+vim /etc/containerd/config.toml
+```
+
+In the section containing
+
+```
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+      ...
+```
+
+Modify the value for `SystemCgroup` from `false` to `true`
+
+```
+            SystemdCgroup = true
+```
+
+#### Doable in one comment
+
+```
+sudo sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
+```
+
+### Restart containerd with the new config
+
+```
+sudo systemctl restart containerd
+```
+
+(some info take from this [blog](https://www.nocentino.com/posts/2021-12-27-installing-and-configuring-containerd-as-a-kubernetes-container-runtime/))
 
 ## Configuring firewall
 
