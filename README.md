@@ -48,8 +48,24 @@ sudo ufw allow 30000:32767/tcp
 
 ```
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-ip6tables = 1
 net.ipv4.ip_forward = 1
 EOF
+```
+
+and add overlay and br_netfilter to current running environment os that they load on booting
+
+```
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+overlay
+br_netfilter
+EOF
+```
+
+```
+sudo modprobe overlay
+sudo modprobe br_netfilter
 ```
 
 # Apply sysctl params without reboot
@@ -74,7 +90,7 @@ sudo update-grub
 sudo reboot
 ```
 
-Do `cat /proc/cmdline` after reboot to verify. If you see `cgroup_no_v1=all` in the output, it means cgroup v2 is active
+Do `cat /proc/cmdline | grub cgroup_no_v1` after reboot to verify. If you see `cgroup_no_v1=all` in the output, it means cgroup v2 is active
 
 ## Install required packages for setup of container runtime (containerd)
 
