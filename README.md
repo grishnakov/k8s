@@ -95,24 +95,35 @@ After reboot to verify. If you see `cgroup_no_v1=all` in the output, it means cg
 
 ## Install runc
 
-Install required dependencies:
+### Install required dependencies
+
+#### Install golang
+
+golang needs to be version 1.23 (as of commit) check the go.mod file of the [runc repository](https://github.com/opencontainers/runc/blob/main/go.mod) to verify which version of golang is needed
 
 ```bash
 # Download latest Go
 curl -s https://go.dev/VERSION?m=text | \
   xargs -I {} curl -LO https://go.dev/dl/{}.linux-amd64.tar.gz
+```
 
+```bash
 # Remove any previous Go installation
 sudo rm -rf /usr/local/go
+```
 
+```bash
 # Extract the new version
 sudo tar -C /usr/local -xzf go*.linux-amd64.tar.gz
+```
 
+```bash
 # (Optional) Add Go to your PATH (if not already)
 echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
 source ~/.bashrc
-
 ```
+
+#### Install other dependencies
 
 ```bash
 sudo apt update && sudo apt install -y make gcc linux-libc-dev libseccomp-dev pkg-config git
