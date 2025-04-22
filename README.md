@@ -158,9 +158,55 @@ runc --version
 
 For maintaining/other issues reference [https://github.com/opencontainers/runc?tab=readme-ov-file](https://github.com/opencontainers/runc?tab=readme-ov-file)
 
-## Install cni plugins
+## Install cni plugins (container network plugins)
+
+Get current tag name from github and set appropriate environment variable:
+
+```bash
+export ARCH=$([ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64")
+export CNI_PLUGIN_VERSION=$(curl -s \
+  https://api.github.com/repos/containernetworking/plugins/releases/latest \
+  | grep '"tag_name":' \
+  | sed -E 's/.*"([^"]+)".*/\1/')
+```
+
+Download latest release:
+
+```bash
+curl -fsSL -o cni-plugins.tgz \
+  "https://github.com/containernetworking/plugins/releases/download/${CNI_PLUGIN_VERSION}/cni-plugins-linux-${ARCH_CNI}-${CNI_PLUGIN_VERSION}.tgz"
+```
+
+Extract and install the binary:
+
+```bash
+sudo mkdir -p /opt/cni/bin
+sudo tar -C /opt/cni/bin -xzvf cni-plugins.tgz
+sudo chown root:root /opt/cni/bin/*
+sudo chmod +x /opt/cni/bin/*
+```
+
+Verify installation worked correctly:
+
+```bash
+ls /opt/cni/bin
+```
+
+You should see plugins like `bridge`, `host-local`, `ipvlan`, `loopback`, etc.
 
 ## Install required packages for setup of container runtime (containerd)
+
+Download and unzip the latest tar.gz:
+
+```bash
+CRD_VERSION=$(curl -s https://api.github.com/repos/containerd/containerd/releases/latest \
+           | grep '"tag_name":' \
+           | sed -E 's/.*"([^"]+)".*/\1/')  
+# 3. Download the corresponding tarball
+wget https://github.com/containerd/containerd/releases/download/${CRD_VERSION}/containerd-${CRD_VERSION}-linux-${ARCH}.tar.gz  
+# 4. Extract into /usr/local
+sudo tar -C /usr/local -xzvf containerd-${CRD_VERSION}-linux-${ARCH}.tar.gz
+```
 
 ```bash
 sudo apt-get update
