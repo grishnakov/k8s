@@ -134,6 +134,30 @@ rm go*.tar.gz
 sudo apt update && sudo apt install -y make gcc linux-libc-dev libseccomp-dev pkg-config git
 ```
 
+### Installing runc
+
+```bash
+git clone https://github.com/opencontainers/runc
+cd runc
+```
+
+run the make command
+
+```bash
+make
+sudo make install
+```
+
+**If there is an error, first check if it was installed, it is possible that the make command built everything already**
+To check:
+
+```bash
+which runc
+runc --version
+```
+
+For maintaining/other issues reference [https://github.com/opencontainers/runc?tab=readme-ov-file](https://github.com/opencontainers/runc?tab=readme-ov-file)
+
 ## Install cni plugins
 
 ## Install required packages for setup of container runtime (containerd)
