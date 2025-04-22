@@ -6,36 +6,6 @@
 radeon.modeset=0
 ```
 
-## Configuring firewall
-
-### For all nodes, but dependent on application
-
-```
-sudo ufw allow ssh
-sudo ufw allow 20
-sudo ufw allow 80
-sudo ufw allow 443
-```
-
-### For control plane node
-
-```
-sudo ufw allow 6443
-sudo ufw allow 2379
-sudo ufw allow 2380
-sudo ufw allow 10250
-sudo ufw allow 10259
-sudo ufw allow 10257
-```
-
-For worker nodes:
-
-```
-sudo ufw allow 10256
-sudo ufw allow 10250
-sudo ufw allow 30000:32767/tcp
-```
-
 ## Disable swap
 
 ```sudo vim /etc/fstab``` comment out the line with swap (last line in the case of boss)
@@ -105,6 +75,38 @@ sudo apt-get install -y apt-transport-https ca-certificates curl
 
 Should be located in `/etc/containerd/config.toml`
 config template here: [config.toml](./config.toml)
+
+## Configuring firewall
+
+### For all nodes, but dependent on application
+
+```
+sudo ufw allow ssh
+sudo ufw allow 20
+sudo ufw allow 80
+sudo ufw allow 443
+```
+
+### For control plane node
+
+```
+sudo ufw allow 6443
+sudo ufw allow 2379
+sudo ufw allow 2380
+sudo ufw allow 10250
+sudo ufw allow 10259
+sudo ufw allow 10257
+```
+
+For worker nodes:
+
+```
+sudo ufw allow 10256
+sudo ufw allow 10250
+sudo ufw allow 30000:32767/tcp
+```
+
+## Kubelet config
 
 kubelet should be configured to use systemd:
 
