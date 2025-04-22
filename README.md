@@ -118,9 +118,14 @@ sudo tar -C /usr/local -xzf go*.linux-amd64.tar.gz
 ```
 
 ```bash
-# (Optional) Add Go to your PATH (if not already)
+# Add Go to your PATH (if not already)
 echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
 source ~/.bashrc
+```
+
+```bash
+# Remove tar.gz file
+rm go*.tar.gz
 ```
 
 #### Install other dependencies
