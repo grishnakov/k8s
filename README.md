@@ -44,6 +44,21 @@ Apply sysctl params without reboot
 sudo sysctl --system
 ```
 
+Verify everything is running:
+
+```
+lsmod | grep br_netfilter
+lsmod | grep overlay
+```
+
+and
+
+```
+sysctl net.bridge.bridge-nf-call-iptables net.bridge.bridge-nf-call-ip6tables net.ipv4.ip_forward
+```
+
+The values should be set to 1
+
 ## Configure cgroup v2 to be the only cgroup (ensure you use systemd as your cgroup driver)
 
 Verify systemd version: ```systemd --version``` this should output version 240+
@@ -69,6 +84,16 @@ cat /proc/cmdline | grep cgroup_no_v1=all
 ```
 
 after reboot to verify. If you see `cgroup_no_v1=all` in the output, it means cgroup v2 is active
+
+## Install runc
+
+Install required dependencies:
+
+```
+sudo apt update && sudo apt install -y make gcc linux-libc-dev libseccomp-dev pkg-config git golang-go
+```
+
+## Install cni plugins
 
 ## Install required packages for setup of container runtime (containerd)
 
@@ -113,7 +138,7 @@ Modify the value for `SystemCgroup` from `false` to `true`
             SystemdCgroup = true
 ```
 
-#### Doable in one comment
+#### Doable in one command
 
 ```
 sudo sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
