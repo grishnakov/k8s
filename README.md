@@ -200,13 +200,92 @@ Download and unzip the latest tar.gz:
 
 ```bash
 CRD_VERSION=$(curl -s https://api.github.com/repos/containerd/containerd/releases/latest \
-           | grep '"tag_name":' \
-           | sed -E 's/.*"([^"]+)".*/\1/')  
+            | grep '"tag_name":' \
+            | sed -E 's/.*"v?([^"]+)".*/\1/')
 # 3. Download the corresponding tarball
-wget https://github.com/containerd/containerd/releases/download/${CRD_VERSION}/containerd-${CRD_VERSION}-linux-${ARCH}.tar.gz  
+wget https://github.com/containerd/containerd/releases/download/v${CRD_VERSION}/containerd-${CRD_VERSION}-linux-${ARCH}.tar.gz
 # 4. Extract into /usr/local
 sudo tar -C /usr/local -xzvf containerd-${CRD_VERSION}-linux-${ARCH}.tar.gz
 ```
+
+Create needed folder for systemd
+
+```bash
+sudo mkdir -p /usr/local/lib/systemd/system/
+```
+
+containerd.service file:
+
+```bash
+sudo bash -c 'cat <<EOF > /usr/local/lib/systemd/system/containerd.service
+# Copyright The containerd Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+[Unit]
+Description=containerd container runtime
+Documentation=https://containerd.io
+After=network.target dbus.service
+
+[Service]
+ExecStartPre=-/sbin/modprobe overlay
+ExecStart=/usr/local/bin/containerd
+
+Type=notify
+Delegate=yes
+KillMode=process
+Restart=always
+RestartSec=5
+
+# Having non-zero Limit*s causes performance problems due to accounting overhead
+# in the kernel. We recommend using cgroups to do container-local accounting.
+LimitNPROC=infinity
+LimitCORE=infinity
+
+# Comment TasksMax if your systemd version does not supports it.
+# Only systemd 226 and above support this version.
+TasksMax=infinity
+OOMScoreAdjust=-999
+
+[Install]
+WantedBy=multi-user.target
+EOF'
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now containerd
+```
+
+Verify:
+
+```bash
+sudo systemctl status containerd.service
+```
+
+Should be `active(running)`
+
+#### Creating the config
+
+```bash
+sudo mkdir /etc/containerd
+```
+
+```bash
+containerd config default | sudo tee /etc/containerd/config.toml > /dev/null
+```
+
+OLD VERSION
 
 ```bash
 sudo apt-get update
@@ -269,7 +348,7 @@ sudo systemctl restart containerd
 
 ```bash
 sudo ufw allow ssh
-sudo ufw allow 20
+sudo ufw allow 22
 sudo ufw allow 80
 sudo ufw allow 443
 ```
