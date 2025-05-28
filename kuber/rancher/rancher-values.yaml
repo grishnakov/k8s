@@ -1,0 +1,37 @@
+hostname: rancher.dolboeb.us
+
+ingress:
+  tls:
+    source: letsEncrypt # Use Let's Encrypt via cert-manager
+  ingressClassName: traefik # Ensure Rancher's Ingress uses the 'traefik' IngressClass
+
+letsEncrypt:
+  email: "dkatulreg@gmail.com" # Required for Let's Encrypt
+  # For Let's Encrypt with an external cert-manager and a pre-configured ClusterIssuer,
+  # the 'ingress.class' here for ACME challenges might be handled by the ClusterIssuer's config.
+  # If Rancher were to create its own Certificate resource without specifying an issuer,
+  # it might need this. However, since we have a ClusterIssuer, Rancher's Certificate
+  # object (if it creates one, or if one is created for its Ingress) should reference it.
+  # The 'ingress.ingressClassName: traefik' on the main Ingress is key.
+
+# privateCA: true
+# Rancher docs suggest privateCA=true for Let's Encrypt if agentTlsMode=strict.
+# This implies agents need to trust the LE CA chain, which is usually in system trust stores.
+# For simplicity, this is commented out. If agent connection issues occur,
+# investigate agentTlsMode and potentially provide LE's CA via additionalTrustedCAs.
+# See.[span_76](start_span)[span_76](end_span)[span_77](start_span)[span_77](end_span)
+
+persistence:
+  enabled: true
+  storageClass: "local-path" # Use the local-path StorageClass (default or explicit)
+  size: 20Gi                 # Adjust size as needed for Rancher data
+
+replicas: 1 # Suitable for a single-node RKE2 cluster
+
+# 'addLocal' is deprecated. Rancher imports the local RKE2 cluster by default.
+# 'restrictedAdmin: false' (default) gives the admin full rights to the local cluster.
+# Set to true to restrict admin's ability to manage the local cluster directly.
+restrictedAdmin: false
+
+bootstrapPassword: "Run4miles" # Set initial admin password
+

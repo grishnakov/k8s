@@ -1,0 +1,7 @@
+helm install traefik traefik/traefik \
+  --namespace traefik \
+  --create-namespace \
+  --values traefik-values.yaml \
+  --version v35.4.0 \
+  --wait
+

@@ -1,0 +1,12 @@
+controller:
+  tolerations:
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists" # "Exists" will match the taint if the key is present, regardless of value
+      effect: "NoSchedule" # This is a common effect for this taint
+# You might also need this for the speaker if they also fail to schedule,
+# but the current error is specific to the controller.
+# speaker:
+#   tolerations:
+#     - key: "node-role.kubernetes.io/control-plane"
+#       operator: "Exists"
+#       effect: "NoSchedule"

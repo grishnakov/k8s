@@ -1,0 +1,11 @@
+# Save as l2advertisement-fix.yaml
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: default
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - first-pool
+  interfaces:
+  - enp2s0  # Replace with your actual interface name

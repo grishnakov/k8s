@@ -1,0 +1,21 @@
+# Save as allow-metallb-traffic.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-metallb-ingress
+  namespace: traefik-system
+spec:
+  podSelector:
+    matchLabels:
+      app: traefik
+  policyTypes:
+  - Ingress
+  ingress:
+  - from: []  # Allow from anywhere
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 8080

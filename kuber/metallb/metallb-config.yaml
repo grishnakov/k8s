@@ -1,0 +1,21 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 192.168.1.240-192.168.1.250
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: default-l2
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - default-pool
+  # Optional: If MetalLB has trouble determining the correct network interface for L2 announcements,
+  # you can specify it explicitly. Replace 'eth0' with your node's primary network interface name.
+  # interfaces:
+  #  - eth0

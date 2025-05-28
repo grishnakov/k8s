@@ -1,0 +1,8 @@
+# Filename: local-path-storageclass.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-path # This is often the default name created by the manifest
+provisioner: rancher.io/local-path # Or the provisioner name specified by the version you installed
+reclaimPolicy: Delete # Or Retain
+volumeBindingMode: WaitForFirstConsumer # Recommended, delays binding until a pod needs it

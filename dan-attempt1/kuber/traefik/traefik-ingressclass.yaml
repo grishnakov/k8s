@@ -1,0 +1,9 @@
+# traefik-ingressclass.yaml
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: traefik
+  # annotations:
+  #   ingressclass.kubernetes.io/is-default-class: "false" # Set to "true" if you want this to be the default
+spec:
+  controller: traefik.io/ingress-controller # Standard controller name for Traefik

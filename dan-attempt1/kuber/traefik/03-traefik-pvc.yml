@@ -1,0 +1,14 @@
+# Filename: 03-traefik-pvc.yml (New file)
+# Apply with: kubectl apply -f 03-traefik-pvc.yml -n traefik-system
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: traefik-acme-certs
+  namespace: traefik-system # Will be set by kubectl -n flag or explicitly here
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi # Adjust size as needed
+  storageClassName: local-path # Optional: specify if needed

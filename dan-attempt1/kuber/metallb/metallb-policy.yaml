@@ -1,0 +1,30 @@
+# Save as metallb-policy.yaml
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-metallb-ingress
+spec:
+  selector: has(kubernetes.io/hostname)
+  types:
+  - Ingress
+  ingress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      nets:
+      - 192.168.1.240/32  # Traefik dashboard
+      - 192.168.1.241/32  # Traefik main
+      ports:
+      - 80
+      - 443
+      - 8080
+  - action: Allow
+    protocol: UDP
+    destination:
+      nets:
+      - 192.168.1.240/32
+      - 192.168.1.241/32
+      ports:
+      - 80
+      - 443
+      - 8080

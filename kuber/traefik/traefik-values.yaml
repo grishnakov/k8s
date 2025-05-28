@@ -1,0 +1,61 @@
+# Service configuration: Expose Traefik via LoadBalancer
+service:
+  enabled: true
+  type: LoadBalancer # MetalLB will assign an IP from its pool
+  # loadBalancerIP: "" # Optional: Specify a static IP from MetalLB pool if needed. Otherwise, MetalLB auto-assigns.
+  ports:
+    web:
+      port: 80         # External port for HTTP
+      targetPort: web  # Maps to Traefik's 'web' entryPoint (container port 8000 by default)
+    websecure:
+      port: 443        # External port for HTTPS
+      targetPort: websecure # Maps to Traefik's 'websecure' entryPoint (container port 8443 by default)
+
+# Entrypoints configuration (Traefik's listening points)
+# Default entryPoints web (container port 8000/http) and websecure (container port 8443/https) are standard.
+# The service.ports above map external 80/443 to these internal entrypoints.
+ports:
+  web:
+    port: 8000        # Traefik container listens on this port for HTTP
+    expose: 
+      default: true      # Expose this entrypoint through the service
+    exposedPort: 80   # Service port (matches service.ports.web.port)
+  websecure:
+    port: 8443        # Traefik container listens on this port for HTTPS
+    expose: 
+      default: true      # Expose this entrypoint through the service
+    exposedPort: 443  # Service port (matches service.ports.websecure.port)
+    tls:
+      enabled: true   # Enable TLS termination on the websecure entrypoint
+
+# IngressClass configuration: Define 'traefik' as an IngressClass
+ingressClass:
+  enabled: true
+  name: traefik # This name is referenced by cert-manager's ClusterIssuer and Rancher's Ingress
+  isDefaultClass: true # Make this the default IngressClass for Ingress resources
+
+# Providers: Enable Kubernetes Ingress (for cert-manager challenges) and CRD (for Traefik IngressRoutes)
+providers:
+  kubernetesCRD:
+    enabled: true # For Traefik's custom resources like IngressRoute, Middleware
+  kubernetesIngress:
+    enabled: true # For standard Kubernetes Ingress resources (used by cert-manager HTTP01)
+    # ingressClass: traefik # Optional: if not default, ensure it watches for 'traefik' class Ingresses
+
+# Logging configuration
+additionalArguments:
+  - "--log.level=INFO"    # Set log level (DEBUG, INFO, WARN, ERROR)
+  - "--accesslog=false"   # Disable access logs to reduce noise; enable if needed for debugging
+  # To enable access logs:
+  # - "--accesslog=true"
+  # - "--accesslog.filepath=/var/log/traefik/access.log" # Example path
+  # - "--accesslog.bufferingsize=100"
+
+# RBAC for CRDs (usually enabled by default if CRD provider is enabled)
+rbac:
+  enabled: true
+
+# Deployment settings for a single-node cluster
+deployment:
+  replicas: 1
+

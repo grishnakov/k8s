@@ -1,0 +1,52 @@
+# Filename: 02-traefik.yml
+# Apply with: kubectl apply -f 02-traefik.yml -n traefik-system
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: traefik-deployment
+  namespace: traefik-system # Will be set by kubectl -n flag or explicitly here
+  labels:
+    app: traefik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-account
+      containers:
+        - name: traefik
+          image: traefik:v3.4 # You can update the version if desired
+          args:
+            # Keeping existing dashboard argument
+            - --api.insecure
+            # MODIFIED/NEW arguments based on Helm command
+            - --log.level=INFO
+            - --entrypoints.web.address=:80
+            - --entrypoints.websecure.address=:443
+            - --providers.kubernetescrd # REPLACED --providers.kubernetesingress
+            - --certificatesresolvers.letsencrypt.acme.email=dkatulreg@gmail.com # CHANGE THIS
+            - --certificatesresolvers.letsencrypt.acme.storage=/certs/acme.json
+            - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
+          ports:
+            - name: web
+              containerPort: 80
+            - name: websecure # ADDED for HTTPS
+              containerPort: 443
+            - name: dashboard
+              containerPort: 8080
+          # ADDED for certificate persistence
+          volumeMounts:
+            - name: traefik-certs
+              mountPath: /certs
+      # ADDED for certificate persistence
+      volumes:
+        - name: traefik-certs
+          persistentVolumeClaim:
+            claimName: traefik-acme-certs # IMPORTANT: You must create this PVC
+        # If you don't want persistence (certs lost on pod restart, NOT recommended for production):
+        # emptyDir: {}

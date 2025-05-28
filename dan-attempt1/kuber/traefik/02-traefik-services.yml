@@ -1,0 +1,35 @@
+# Filename: 02-traefik-services.yml
+# Apply with: kubectl apply -f 02-traefik-services.yml -n traefik-system
+
+# Service for the Traefik dashboard (optional, keeping as is)
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-dashboard-service
+  namespace: traefik-system # Will be set by kubectl -n flag or explicitly here
+spec:
+  type: LoadBalancer
+  ports:
+    - name: dashboard-http # Renamed for clarity, was 'dashboard'
+      port: 8080
+      targetPort: dashboard # Matches container port name
+  selector:
+    app: traefik
+---
+# MODIFIED Service for Traefik web entrypoints (HTTP and HTTPS)
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik # RENAMED from traefik-web-service for clarity, or keep as is if preferred
+  # namespace: traefik-system # Will be set by kubectl -n flag or explicitly here
+spec:
+  type: LoadBalancer # As per --set service.type=LoadBalancer
+  ports:
+    - name: web
+      port: 80
+      targetPort: web # Matches container port name for HTTP
+    - name: websecure # ADDED for HTTPS
+      port: 443
+      targetPort: websecure # Matches container port name for HTTPS
+  selector:
+    app: traefik
