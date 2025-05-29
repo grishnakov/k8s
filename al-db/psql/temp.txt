@@ -1,0 +1,15 @@
+kubectl -n cafepsql create secret generic cafes `
+  --from-literal POSTGRES_USER="cafeusers" `
+  --from-literal POSTGRES_PASSWORD='iLoveVeronica' `
+  --from-literal POSTGRES_DB="cafe" `
+  --from-literal REPLICATION_USER="user" `
+  --from-literal REPLICATION_PASSWORD='Run4miles'
+
+
+
+  kubectl -n postgresql create secret generic postgresql \
+  --from-literal=POSTGRES_USER=gitlab \
+  --from-literal=POSTGRES_PASSWORD=Run4miles \
+  --from-literal=POSTGRES_DB=gitlabhq_production \
+  --from-literal=REPLICATION_USER=user \
+  --from-literal=REPLICATION_PASSWORD=Run4miles
